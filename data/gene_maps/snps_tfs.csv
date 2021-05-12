@@ -1,0 +1,39 @@
+﻿gene,type
+PNPLA3,snp
+TM6SF2,snp
+GCKR,snp
+MBOAT7,snp
+MBOAT8,snp
+MBOAT9,snp
+HSD17B13,snp
+NRF1,PGC1 tf
+NRF2,PGC1 tf
+PPARA,PGC1 tf
+ERRA,PGC1 tf
+YY1,PGC1 tf
+FOXA2,PGC1 tf
+FOXO1,PGC1 tf
+HNF4A,PGC1 tf
+GR,PGC1 tf
+CREB,PGC1 tf
+SREBP1C,PGC1 tf
+LXRA,PGC1 tf
+SREBP1C,PGC1 tf
+TFAM,PGC1 downstream gene
+COX4,PGC1 downstream gene
+TRB3,PGC1 downstream gene
+CPT1A,PGC1 downstream gene
+PDK4,PGC1 downstream gene
+MCAD,PGC1 downstream gene
+ACADM,PGC1 downstream gene
+APOC3,PGC1 downstream gene
+PEPCK,PGC1 downstream gene
+PCK2,PGC1 downstream gene
+G6PC,PGC1 downstream gene
+FASN,PGC1 downstream gene
+ACLY,PGC1 downstream gene
+ACC,PGC1 downstream gene
+ACACA,PGC1 downstream gene
+SCD,PGC1 downstream gene
+DGAT1,PGC1 downstream gene
+DGAT2,PGC1 downstream gene
