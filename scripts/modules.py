@@ -33,8 +33,6 @@ class Modules(object):
         self.num_samples = num_samples
         self.similarity_dists = self.get_similarity_distributions() # key is a sorted (ascending) tuple
         self.pvalues = pd.read_csv(r'../data/similarity_pvalues_sum.csv', index_col=0)
-        # TODO: integrate pvalue functions into this and re-run if you have time
-        # TODO: calculate individual gene effects
         self.num_modules = len(self.module_vectors.index)
 
         self.curated_genes = sorted(self.module_to_genes[self.nash])
@@ -166,8 +164,8 @@ class Modules(object):
         """
         Returns a df with gene and score for cosine similarity of gene embedding to module vector, sorted by similarity
         :param genes: list of gene names
-        :param module: module name to use for module vector
-        :return: pandas df: cols = 'gene', 'cosine similarity'
+        :param module: list of module names
+        :return: pandas df: rows = gene names, cols = module names, values = gene-module cosine similarity
         """
         # gene_scores = pd.DataFrame(columns=['gene', 'cosine similarity'])
         scores = pd.DataFrame(index=genes)
@@ -273,6 +271,10 @@ class Modules(object):
         return list(set(sven_data.index) & set(self.gene_embeddings.index) - set(self.curated_genes) - set(self.befree_genes))
 
     def gene_module_normalized_scores(self):
+        """
+        Gathers information on how many genes are in a module, the average and std of within module gene-gene cosine similarity, 
+        and the average and std of gene-summed module vector cosine similarity
+        """
         mod_scores = self.get_module_features()
 
         dct = defaultdict(list)

@@ -18,8 +18,10 @@ class Nash_Model(object):
         np.random.seed(0)
         self.M = Modules()
         if use_modules:
+            # use gene-module vector cosine similarities
             self.dataset = self.M.get_module_features()
         else:
+            # use embeddings directly
             self.dataset = self.M.gene_embeddings
 
         self.feat_sel = feat_sel
@@ -33,7 +35,8 @@ class Nash_Model(object):
         
         self.save_path = self.set_save_path(save_path)
 
-        # leave out 200 genes for testing
+        # leave out 200 genes to use as negatives for testing
+        # make sure negative genes are not in known Nash gene sets
         negative_genes = sorted(list(set(self.dataset.index) - set(self.M.curated_genes)
                                      - set(self.M.befree_genes) - set(self.M.sven_genes)))
         self.neg_test_genes = sorted(list(np.random.choice(negative_genes, 200)))
@@ -52,8 +55,6 @@ class Nash_Model(object):
     def set_save_path(self, path):
         """
         Updates save path and creates files
-        :param path:
-        :return:
         """
         self.save_path = path
         if not os.path.exists(path):
@@ -62,13 +63,27 @@ class Nash_Model(object):
     
     def format_input(self, pos_genes, neg_genes):
         """
-        Returns a formatted test or train set using the model's features and specified genes
+        Returns a formatted test or train set using the model's features and specified genes.
+        Format to be used for all methods below for any variation of X, y
+
+        :param pos_genes: list of gene symbols to be used as positives for the model
+        :param neg_genes: list of gene symbols to be used as negatives for the model
+
+        :return X: dataframe of dataset only including the positive and negative genes
+        list of labels for each genes
+        :return y: labels for genes in X
         """
         X = self.dataset.loc[pos_genes + neg_genes, ]
         y = np.array([1] * len(pos_genes) + [0] * len(neg_genes))
         return X, y
 
     def do_feat_sel(self, train_X, train_y):
+        """
+        Does SelectKBest (sklearn) feature selection on the given training dataset and returns a transformed with top 64
+        features selected. Saves csv with feature scores to self.save_path
+
+        :return transformed train X with top 64 features selected
+        """
         # feature selection based on training set only
         train_X_fs = pd.DataFrame(self.skb.fit_transform(train_X, train_y), index=train_X.index)
         pkl.dump(self.skb, open(self.save_path + '/feat_selector.pkl', 'wb'))
@@ -78,16 +93,19 @@ class Nash_Model(object):
         return train_X_fs
 
     def train(self, train_X, train_y):
+        """
+        Does feature selection, resampling, and trains model on train_X and train_y
+        """
         if self.feat_sel:
             train_X = self.do_feat_sel(train_X, train_y)
 
         train_X, train_y = self.sample.fit_resample(train_X, train_y)
         self.clf.fit(train_X, train_y)
 
-
     def train_all_curated(self, bench=False):
         """
         Trains svm on all 70 curated genes and saves model
+        :param bench: if true, the model will do benchmarking
         """
         train_X, train_y = self.format_input(self.M.curated_genes, self.neg_train_genes)
         self.train(train_X, train_y)
@@ -100,23 +118,11 @@ class Nash_Model(object):
         if self.feat_sel:
             self.dataset = pd.DataFrame(self.skb.transform(self.dataset), index=self.dataset.index)
 
-    def test(self, test_X, test_y):
-        if self.feat_sel:
-            test_X = self.skb.transform(test_X)
-        predicted = self.clf.predict_proba(test_X)[:, 1]
-        return roc_auc_score(test_y, predicted), average_precision_score(test_y, predicted)
-        
-    def cross_validate(self, X, y):
-        roc_ap = []
-        kfold = StratifiedKFold(n_splits=10, shuffle=True, random_state = 0)
-        for train_ix, test_ix in kfold.split(X, y):
-            train_X, test_X = X.iloc[train_ix, :], X.iloc[test_ix, :]
-            train_y, test_y = y[train_ix], y[test_ix]
-            self.train(train_X, train_y)
-            roc_ap.append(self.test(test_X, test_y))
-        return roc_ap
-    
     def benchmark(self, train_X, train_y):
+        """
+        Does cross validation and tests the trained model on both the befree and svensson gene sets.
+        Saves output to dataframe in self.save_path
+        """
         roc_ap = []
         test_X, test_y = self.format_input(self.M.befree_genes, self.neg_test_genes)
         roc_ap.append(self.test(test_X, test_y))
@@ -126,11 +132,38 @@ class Nash_Model(object):
 
         index = list(range(1, 11))
         index = ['befree', 'sven'] + index
-        output = pd.DataFrame([index] + list(zip(*roc_ap)), index=['label','roc', 'ap'])
+        output = pd.DataFrame([index] + list(zip(*roc_ap)), index=['label', 'roc', 'ap'])
         output.to_csv(self.save_path + '/benchmarking output')
 #         print(output)
 
+    def cross_validate(self, X, y):
+        """
+        Does Stratified 10 Fold cross validation on the given X and y (training set)
+        :return list of tuples with (roc, ap) for each CV fold
+        """
+        roc_ap = []
+        kfold = StratifiedKFold(n_splits=10, shuffle=True, random_state=0)
+        for train_ix, test_ix in kfold.split(X, y):
+            train_X, test_X = X.iloc[train_ix, :], X.iloc[test_ix, :]
+            train_y, test_y = y[train_ix], y[test_ix]
+            self.train(train_X, train_y)
+            roc_ap.append(self.test(test_X, test_y))
+        return roc_ap
+
+    def test(self, test_X, test_y):
+        """
+        Tests trained model on given test set and returns Area Under the ROC Curve and Average Precision Score
+        """
+        if self.feat_sel:
+            test_X = self.skb.transform(test_X)
+        predicted = self.clf.predict_proba(test_X)[:, 1]
+        return roc_auc_score(test_y, predicted), average_precision_score(test_y, predicted)
+
     def score_all_genes(self):
+        """
+        Scores all genes in dataset using predic_proba and saves scores and predictions to save_path
+        :return:
+        """
         scores = pd.DataFrame(self.clf.predict_proba(self.dataset), index=self.dataset.index)[1]
         scores = pd.DataFrame(scores).sort_values(1, ascending=False)
         scores['known'] = [int(g in list(self.M.befree_genes + self.M.curated_genes + self.M.sven_genes)) for g in scores.index]

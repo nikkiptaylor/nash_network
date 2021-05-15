@@ -69,6 +69,10 @@ class Nash_Model(object):
         return X, y
 
     def do_feat_sel(self, train_X, train_y):
+        """
+        Does SelectKBest (sklearn) feature selection on the given training dataset and returns a transformed with top 64
+        features selected
+        """
         # feature selection based on training set only
         train_X_fs = pd.DataFrame(self.skb.fit_transform(train_X, train_y), index=train_X.index)
         pkl.dump(self.skb, open(self.save_path + '/feat_selector.pkl', 'wb'))
@@ -78,12 +82,14 @@ class Nash_Model(object):
         return train_X_fs
 
     def train(self, train_X, train_y):
+        """
+        Does feature selection, resampling, and trains model on train_X and train_y
+        """
         if self.feat_sel:
             train_X = self.do_feat_sel(train_X, train_y)
 
         train_X, train_y = self.sample.fit_resample(train_X, train_y)
         self.clf.fit(train_X, train_y)
-
 
     def train_all_curated(self, bench=False):
         """
@@ -101,12 +107,18 @@ class Nash_Model(object):
             self.dataset = pd.DataFrame(self.skb.transform(self.dataset), index=self.dataset.index)
 
     def test(self, test_X, test_y):
+        """
+        Tests trained model on given test set and returns Area Under the ROC Curve and Average Precision Score
+        """
         if self.feat_sel:
             test_X = self.skb.transform(test_X)
         predicted = self.clf.predict_proba(test_X)[:, 1]
         return roc_auc_score(test_y, predicted), average_precision_score(test_y, predicted)
         
     def cross_validate(self, X, y):
+        """
+        Does Stratified 10 Fold cross validation on the given X and y (training set)
+        """
         roc_ap = []
         kfold = StratifiedKFold(n_splits=10, shuffle=True, random_state = 0)
         for train_ix, test_ix in kfold.split(X, y):
