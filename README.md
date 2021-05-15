@@ -25,6 +25,8 @@ node2vec hyperparameters: length of walks=30, number of walks=10, min count=1, b
 
 **Distance metric:** Cosine similarity was used to calculate similarity scores between different gene embeddings and module vectors.
 
+## Data files
+
 ## Scripts
 **modules.py:** 
 
@@ -77,6 +79,8 @@ Also does benchmarking of how different score cuttofs for Svensson genes and Bef
 Trains and saves the final "refined" model that performed best based on benchmarking and Svensson/Befree genes as external test sets.
 
 The final model used to score all genes included a Linear SVC, training using all 70 curated genes as positives and a random set of 200 held out as negative set, random undersampling to achieve 1:2 positive to negative ratio, gene-module cosine similarity scores as features, and feature selection to pick top 64 modules based on ANOVA F-value.
+
+## results files
 
 ## Figures:
 
