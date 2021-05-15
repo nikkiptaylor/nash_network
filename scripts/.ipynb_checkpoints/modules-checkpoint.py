@@ -293,3 +293,4 @@ class Modules(object):
 
         output = pd.DataFrame(dct, index=mod_scores.columns)
         output.to_csv('../results/module_normalization.csv')
+        return output
