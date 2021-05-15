@@ -90,7 +90,8 @@ nash_svc = pkl.load(open('../../results/final_model_svc/nash_model_trained.pkl',
 feature_selector = nash_svc.skb
 model = nash_svc.clf
 ```
-Note: figures rely on model output, so the path to the final model must have the most up to date trained model before running code to generate figures
-3. To re-train model or use different configurations, change Nash_Model input in train_final_model and run all cells.
+Note: figures rely on model output, so the path to the final model must have the most up to date trained model before running code to generate figures. 
+
+To re-train model or use different configurations, change Nash_Model input in train_final_model and run all cells.
 
 
