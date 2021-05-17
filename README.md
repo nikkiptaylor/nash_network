@@ -63,8 +63,10 @@ m.gene_to_modules['ACSL1'] # gets list of modules ACSL1 is in
 
 The most important methods for getting features to feed into the predictive model are
 ``` 
-m.prioritize_genes(genes, modules) # returns matrix of cosine similarity between specified gene embeddings and module vectors
-m.get_module_features # returns matrix of cosine similarity between all 14,707 embedded genes and all 237 modules
+# return matrix of cosine similarity between specified gene embeddings and module vectors
+m.prioritize_genes(genes, modules) 
+# returns matrix of cosine similarity between all 14,707 embedded genes and all 237 modules
+m.get_module_features 
 ```
 
 Note: this file contains a number of methods that were used for previous analysis but are not part of the predictive modeling, so most of the methods can be ignored
@@ -85,6 +87,8 @@ Examples of how to instantiate the model with different configurations can be fo
 
 
 **train_final_model.ipynb**
+
+
 Part 1: Benchmarking - 
 
 Does benchmarking of model parameters, including
