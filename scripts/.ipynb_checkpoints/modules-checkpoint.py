@@ -12,37 +12,38 @@ from collections import defaultdict
 import itertools
 
 class Modules(object):
-    def __init__(self, calc_modules=False, num_samples=1000):
+    def __init__(self, data_path = '../data', calc_modules=False):
         self.nash = 'Nonalcoholic Steatohepatitis'
-
-        # all modules = all non disease modules + nash module
+        self.data_path = data_path
+        
         # columns: gene, module
-        self.all_mods_genes = pd.read_csv(r'../data/gene_maps/all_modules.csv')
-        self.gene_embeddings = pd.read_csv(r'../data/gene_maps/embedding.csv', index_col=0)
-        # dicts
+        # all_mods_genes includs hallmark, immune, metabolic, drug, and nash genes
+        self.all_mods_genes = pd.read_csv(data_path + 'gene_maps/all_modules.csv')
+        self.gene_embeddings = pd.read_csv(data_path + '/gene_maps/embedding.csv', index_col=0)
+        
+        # dicts for easy acess to gene sets
         self.module_to_genes, self.gene_to_modules = self.map_modules_genes()
         
-        # module embeddings
+        # create/load module embeddings
         if calc_modules:
             self.module_vectors = self.get_module_vectors()
             self.module_similarities = self.get_module_similarities()
         else:
-            self.module_vectors = pd.read_csv('../data/module_vectors_summed.csv', index_col=0)
-            self.module_similarities = pd.read_csv('../data/module_similarities.csv', index_col=0)
+            self.module_vectors = pd.read_csv(data_path + '/module_vectors_summed.csv', index_col=0)
+            self.module_similarities = pd.read_csv(data_path + '/module_similarities.csv', index_col=0)
 
-        self.num_samples = num_samples
-        self.similarity_dists = self.get_similarity_distributions() # key is a sorted (ascending) tuple
-        self.pvalues = pd.read_csv(r'../data/similarity_pvalues_sum.csv', index_col=0)
         self.num_modules = len(self.module_vectors.index)
-
+        
+        # gold standard genes
         self.curated_genes = sorted(self.module_to_genes[self.nash])
         self.befree_genes = sorted(self.load_befree_genes(0))
         self.sven_genes = sorted(self.load_svensson_genes(0))
+        
+#         self.num_samples = 1000
+#         self.pvalues = pd.read_csv(data_path + '/similarity_pvalues_sum.csv', index_col=0)
+#         self.similarity_dists = self.get_similarity_distributions() # key is a sorted (ascending) tuple
 
 
-    # Function to create dicts to access genes in a module, module labels
-    # Gets called on initialization to store dicts for quicker use
-    ##########
     def map_modules_genes(self):
         """
         Return dicts:
@@ -55,12 +56,10 @@ class Modules(object):
         module_genes = dict(only_embedded.groupby('module')['gene'].apply(list))
         return module_genes, gene_modules
 
-    # Functions to get similarities between modules
-    ######
     def sum_embeddings(self, mod_genes):
         """
-    	Takes a list of genes and returns a summed vector to represent the genes in the module
-    	"""
+        Takes a list of genes and returns a summed vector to represent the genes in the module
+        """
         mod_embeds = self.gene_embeddings.loc[mod_genes,:].to_numpy()
         if len(mod_genes) == 1:
             return mod_embeds.flatten()
@@ -79,7 +78,7 @@ class Modules(object):
             mod_vector = self.sum_embeddings(mod_genes)
             module_vecs[mod_name] = mod_vector
         module_vecs = module_vecs.T
-        module_vecs.to_csv('../data/module_vectors_summed.csv')
+        module_vecs.to_csv(self.data_path + '/module_vectors_summed.csv')
         return module_vecs
 
     def get_module_similarities(self):
@@ -89,78 +88,10 @@ class Modules(object):
         """
         similarities = pd.DataFrame(cosine_similarity(self.module_vectors), columns=self.module_vectors.index,
                                     index=self.module_vectors.index)
-        similarities.to_csv('../data/module_similarities.csv')
+        similarities.to_csv(self.data_path + '/module_similarities.csv')
         return similarities
-
-    def get_similarity_distributions(self):
-        """
-        Imports a pickle file with a dict to each distribution if such a file already exists
-        :return:
-        """
-        if path.exists('similarity_distributions.pkl'):
-            return pkl.load(open('similarity_distributions.pkl', 'rb'))
-        else:
-            return {}
-
-    def add_sim_distribution(self, size1, size2):
-        """
-        Adds a distribution to the dict of similarity distributions based on a combination of sizes
-        :param size1: number of genes in first module
-        :param size2: number of genes in second module
-        :return:
-        """
-        genes = list(self.gene_embeddings.index)
-        dist = []
-        for i in range(self.num_samples):
-            genes1 = np.random.choice(genes, size1)
-            genes2 = np.random.choice(genes, size2)
-            embed1 = self.sum_embeddings(genes1)
-            embed2 = self.sum_embeddings(genes2)
-            dist.append(float(cosine_similarity([embed1], [embed2])))
-        key = tuple(sorted([size1, size2]))
-        self.similarity_dists[key] = dist
-        pkl.dump(self.similarity_dists, open('similarity_distributions.pkl', 'wb'))
-
-    def get_pvalue(self, size1, size2, sim):
-        """
-        Calulates the pvalue for a similarity based on the number of genes in each module used to calculate
-        :param size1: number of genes in 1st module
-        :param size2: number of genes in 2nd module
-        :param sim: similarity between modules
-        :return: pvalue
-        """
-        key = tuple(sorted([size1, size2]))
-        if key not in self.similarity_dists.keys():
-            self.add_sim_distribution(size1, size2)
-        pval = sum(np.array(self.similarity_dists[key]) - sim >= 0)/float(self.num_samples)
-        return pval
-
-    def calculate_module_pvalues(self):
-        pvals = pd.DataFrame(index=self.module_vectors.index, columns=self.module_vectors.index)
-        for mod1 in self.module_to_genes.keys():
-            for mod2 in self.module_to_genes.keys():
-                sim = self.module_similarities.loc[mod1, mod2]
-                size1 = len(self.module_to_genes[mod1])
-                size2 = len(self.module_to_genes[mod2])
-                pvals.loc[mod1, mod2] = self.get_pvalue(size1, size2, sim)
-        return pvals
-
-    # Functions to get info about module similarities
-    #######
-    def get_modules_with_pval(self, mod_of_interest):
-        """
-        Returns the names of all modules and their similarities with a cosine similarity
-        to mod_of_interest pvalue < bonferroni pval
-        :param mod_of_interest: module name
-        :return: dataframe of similarities (index = name_
-        """
-        pval = .05 / self.num_modules
-        mod_pvalues = pd.DataFrame(self.pvalues[mod_of_interest])
-        sig_mods = mod_pvalues[mod_pvalues[mod_of_interest] < pval].index
-        sims = self.module_similarities.loc[sig_mods, mod_of_interest]
-        return sims
-
-    def prioritize_genes(self, genes, modules):
+    
+     def prioritize_genes(self, genes, modules):
         """
         Returns a df with gene and score for cosine similarity of gene embedding to module vector, sorted by similarity
         :param genes: list of gene names
@@ -178,71 +109,13 @@ class Modules(object):
             scores = scores.join(similarities, how = 'left')
         return scores
 
-    def filter_similarity_matrix(self):
+     def get_module_features(self):
         """
-        Return matrix of cosine similarities filtered by p_value (bonferroni corrected)
+        Removes the drug and NASH modules and returns a set of module scores to use as features for svm 
+        (drug and nash modules are related to Nash already)
         :return:
         """
-        sig = self.pvalues > .05 / (self.num_modules ** 2)
-        sims = self.module_similarities
-        sims[sig] = 0
-        return sims
-    
-    def enrichment_in_modules(self, gene_set):
-        """
-        Computes hypergeometric pvalue for set of genes enriched in each of the modules
-        Returns pandas dataframe
-        :param gene_set: set of genes to see if 
-        """
-        M = len(self.gene_embeddings.index)
-        pvals = {}
-        for module, genes in self.module_to_genes.items():
-            n = len(genes)
-            N = len(gene_set)
-            x = len(set(genes) & set(gene_set))
-            pvals[module] = hypergeom.sf(x-1, M, n, N)
-        return pd.DataFrame.from_dict(pvals, orient='index')
-            
-    def get_hypergeom_pval(self, mod1, mod2):
-        """
-        Gets the hypergeometric p-value for enrichment of mod2 genes in mod_1
-        :param mod1 name of module1 1
-        :param mod2 name of module 2 (calculating enrichment of this in mod1)
-        :return: p-value
-
-
-        https://blog.alexlenail.me/understanding-and-implementing-the-hypergeometric-test-in-python-a7db688a7458
-        M is the population size (previously N) - total genes
-        n is the number of successes in the population (previously K) - cluster count
-        N is the sample size (previously n) - module count
-        X is still the number of drawn “successes”. - num in cluster and module
-        pval = hypergeom.sf(x-1, M, n, N)
-        """
-        M = len(self.gene_embeddings.index)
-        mod1_genes = set(self.module_to_genes[mod1])
-        mod2_genes = set(self.module_to_genes[mod2])
-        n = len(mod1_genes)
-        N = len(mod2_genes)
-        x = len(mod1_genes & mod2_genes)
-        return hypergeom.sf(x - 1, M, n, N)
-
-    def save_hypergeom_pvals(self, mod1_list, mod2_list, file):
-        """
-        Gets a dataframe of p values for enrichment of modules in list 2 in modules in list 1, saves to file
-        """
-        vhyper = np.vectorize(self.get_hypergeom_pval)
-        pvals = vhyper(mod1_list, mod2_list)
-        pv_df = pd.DataFrame(pvals, index=mod1_list, columns=mod2_list)
-        pv_df.to_csv(file)
-        return pv_df
-
-    # Functions for SVM use
-    def get_module_features(self):
-        """
-        Removes the drug and NASH modules and returns a set of module scores to use as features for svm
-        :return:
-        """
-        drug_modules = pd.read_csv('../data/gene_maps/drug.csv')
+        drug_modules = pd.read_csv(self.data_path + '/gene_maps/drug.csv') 
         drugs = set(drug_modules['module'])
         rem = list(drugs) + [self.nash]
         mods = list(set(self.module_to_genes.keys()) - set(rem))
@@ -254,7 +127,7 @@ class Modules(object):
         :param threshold:
         :return:
         """
-        befree = pd.read_csv('../data/befree_genes.csv')
+        befree = pd.read_csv(self.data_path + '/befree_genes.csv')
         befree = befree[befree['score'] > threshold]
         return list(set(befree['gene']) & set(self.gene_embeddings.index) - set(self.curated_genes))
 
@@ -264,7 +137,7 @@ class Modules(object):
         :param threshold
         :return
         """
-        sven_data = pd.read_csv('../data/srebp1c high genes_top200_high.csv').dropna()
+        sven_data = pd.read_csv(self.data_path + '/svensson_200.csv').dropna()
         logfc = 'high Log2 Fold Change'
         sven_data.index = [x.upper() for x in list(sven_data['FeatureName'])]
         sven_data = sven_data[sven_data[logfc] > threshold]
@@ -294,3 +167,130 @@ class Modules(object):
         output = pd.DataFrame(dct, index=mod_scores.columns)
         output.to_csv('../results/module_normalization.csv')
         return output
+    
+#     ###### OLD METHODS ######
+#     def get_similarity_distributions(self):
+#         """
+#         Imports a pickle file with a dict to each distribution if such a file already exists
+#         :return:
+#         """
+#         if path.exists('similarity_distributions.pkl'):
+#             return pkl.load(open('similarity_distributions.pkl', 'rb'))
+#         else:
+#             return {}
+
+#     def add_sim_distribution(self, size1, size2):
+#         """
+#         Adds a distribution to the dict of similarity distributions based on a combination of sizes
+#         :param size1: number of genes in first module
+#         :param size2: number of genes in second module
+#         :return:
+#         """
+#         genes = list(self.gene_embeddings.index)
+#         dist = []
+#         for i in range(self.num_samples):
+#             genes1 = np.random.choice(genes, size1)
+#             genes2 = np.random.choice(genes, size2)
+#             embed1 = self.sum_embeddings(genes1)
+#             embed2 = self.sum_embeddings(genes2)
+#             dist.append(float(cosine_similarity([embed1], [embed2])))
+#         key = tuple(sorted([size1, size2]))
+#         self.similarity_dists[key] = dist
+#         pkl.dump(self.similarity_dists, open('similarity_distributions.pkl', 'wb'))
+
+#     def get_pvalue(self, size1, size2, sim):
+#         """
+#         Calulates the pvalue for a similarity based on the number of genes in each module used to calculate
+#         :param size1: number of genes in 1st module
+#         :param size2: number of genes in 2nd module
+#         :param sim: similarity between modules
+#         :return: pvalue
+#         """
+#         key = tuple(sorted([size1, size2]))
+#         if key not in self.similarity_dists.keys():
+#             self.add_sim_distribution(size1, size2)
+#         pval = sum(np.array(self.similarity_dists[key]) - sim >= 0)/float(self.num_samples)
+#         return pval
+
+#     def calculate_module_pvalues(self):
+#         pvals = pd.DataFrame(index=self.module_vectors.index, columns=self.module_vectors.index)
+#         for mod1 in self.module_to_genes.keys():
+#             for mod2 in self.module_to_genes.keys():
+#                 sim = self.module_similarities.loc[mod1, mod2]
+#                 size1 = len(self.module_to_genes[mod1])
+#                 size2 = len(self.module_to_genes[mod2])
+#                 pvals.loc[mod1, mod2] = self.get_pvalue(size1, size2, sim)
+#         return pvals
+
+#     def get_modules_with_pval(self, mod_of_interest):
+#         """
+#         Returns the names of all modules and their similarities with a cosine similarity
+#         to mod_of_interest pvalue < bonferroni pval
+#         :param mod_of_interest: module name
+#         :return: dataframe of similarities (index = name_
+#         """
+#         pval = .05 / self.num_modules
+#         mod_pvalues = pd.DataFrame(self.pvalues[mod_of_interest])
+#         sig_mods = mod_pvalues[mod_pvalues[mod_of_interest] < pval].index
+#         sims = self.module_similarities.loc[sig_mods, mod_of_interest]
+#         return sims
+
+#     def filter_similarity_matrix(self):
+#         """
+#         Return matrix of cosine similarities filtered by p_value (bonferroni corrected)
+#         :return:
+#         """
+#         sig = self.pvalues > .05 / (self.num_modules ** 2)
+#         sims = self.module_similarities
+#         sims[sig] = 0
+#         return sims
+    
+#     def enrichment_in_modules(self, gene_set):
+#         """
+#         Computes hypergeometric pvalue for set of genes enriched in each of the modules
+#         Returns pandas dataframe
+#         :param gene_set: set of genes to see if 
+#         """
+#         M = len(self.gene_embeddings.index)
+#         pvals = {}
+#         for module, genes in self.module_to_genes.items():
+#             n = len(genes)
+#             N = len(gene_set)
+#             x = len(set(genes) & set(gene_set))
+#             pvals[module] = hypergeom.sf(x-1, M, n, N)
+#         return pd.DataFrame.from_dict(pvals, orient='index')
+            
+#     def get_hypergeom_pval(self, mod1, mod2):
+#         """
+#         Gets the hypergeometric p-value for enrichment of mod2 genes in mod_1
+#         :param mod1 name of module1 1
+#         :param mod2 name of module 2 (calculating enrichment of this in mod1)
+#         :return: p-value
+
+
+#         https://blog.alexlenail.me/understanding-and-implementing-the-hypergeometric-test-in-python-a7db688a7458
+#         M is the population size (previously N) - total genes
+#         n is the number of successes in the population (previously K) - cluster count
+#         N is the sample size (previously n) - module count
+#         X is still the number of drawn “successes”. - num in cluster and module
+#         pval = hypergeom.sf(x-1, M, n, N)
+#         """
+#         M = len(self.gene_embeddings.index)
+#         mod1_genes = set(self.module_to_genes[mod1])
+#         mod2_genes = set(self.module_to_genes[mod2])
+#         n = len(mod1_genes)
+#         N = len(mod2_genes)
+#         x = len(mod1_genes & mod2_genes)
+#         return hypergeom.sf(x - 1, M, n, N)
+
+#     def save_hypergeom_pvals(self, mod1_list, mod2_list, file):
+#         """
+#         Gets a dataframe of p values for enrichment of modules in list 2 in modules in list 1, saves to file
+#         """
+#         vhyper = np.vectorize(self.get_hypergeom_pval)
+#         pvals = vhyper(mod1_list, mod2_list)
+#         pv_df = pd.DataFrame(pvals, index=mod1_list, columns=mod2_list)
+#         pv_df.to_csv(file)
+#         return pv_df
+
+   

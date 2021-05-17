@@ -17,6 +17,8 @@ class Nash_Model(object):
     def __init__(self, save_path, use_modules=True, feat_sel=True, sample=None, model_type='SVC'):
         np.random.seed(0)
         self.M = Modules()
+        
+        # module scores vs embeddings as features
         if use_modules:
             # use gene-module vector cosine similarities
             self.dataset = self.M.get_module_features()
@@ -86,7 +88,6 @@ class Nash_Model(object):
         """
         # feature selection based on training set only
         train_X_fs = pd.DataFrame(self.skb.fit_transform(train_X, train_y), index=train_X.index)
-        pkl.dump(self.skb, open(self.save_path + '/feat_selector.pkl', 'wb'))
         scores = pd.DataFrame({'score': self.skb.scores_, 'pval': self.skb.pvalues_}).T
         scores.columns = train_X.columns
         scores.to_csv(self.save_path + '/feature_scores.csv')
@@ -110,7 +111,6 @@ class Nash_Model(object):
         train_X, train_y = self.format_input(self.M.curated_genes, self.neg_train_genes)
         self.train(train_X, train_y)
         pkl.dump(self, open(self.save_path + '/nash_model_trained.pkl', 'wb'))
-        pkl.dump(self.clf, open(self.save_path + '/model.pkl', 'wb'))
         if bench:
             self.benchmark(train_X, train_y)
 
