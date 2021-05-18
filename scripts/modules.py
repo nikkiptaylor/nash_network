@@ -17,11 +17,11 @@ class Modules(object):
         self.data_path = data_path
         
         # columns: gene, module
-        # all_mods_genes includs hallmark, immune, metabolic, drug, and nash genes
-        self.all_mods_genes = pd.read_csv(data_path + 'gene_maps/all_modules.csv')
+        # all_mods_genes includes hallmark, immune, metabolic, drug, and nash genes
+        self.all_mods_genes = pd.read_csv(data_path + '/gene_maps/all_modules.csv')
         self.gene_embeddings = pd.read_csv(data_path + '/gene_maps/embedding.csv', index_col=0)
         
-        # dicts for easy acess to gene sets
+        # dicts for easy access to gene sets
         self.module_to_genes, self.gene_to_modules = self.map_modules_genes()
         
         # create/load module embeddings
@@ -91,7 +91,7 @@ class Modules(object):
         similarities.to_csv(self.data_path + '/module_similarities.csv')
         return similarities
     
-     def prioritize_genes(self, genes, modules):
+    def prioritize_genes(self, genes, modules):
         """
         Returns a df with gene and score for cosine similarity of gene embedding to module vector, sorted by similarity
         :param genes: list of gene names
@@ -109,13 +109,13 @@ class Modules(object):
             scores = scores.join(similarities, how = 'left')
         return scores
 
-     def get_module_features(self):
+    def get_module_features(self):
         """
-        Removes the drug and NASH modules and returns a set of module scores to use as features for svm 
+        Removes the drug and NASH modules and returns a set of module scores to use as features for svm
         (drug and nash modules are related to Nash already)
         :return:
         """
-        drug_modules = pd.read_csv(self.data_path + '/gene_maps/drug.csv') 
+        drug_modules = pd.read_csv(self.data_path + '/gene_maps/drug.csv')
         drugs = set(drug_modules['module'])
         rem = list(drugs) + [self.nash]
         mods = list(set(self.module_to_genes.keys()) - set(rem))

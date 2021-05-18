@@ -91,7 +91,7 @@ class Modules(object):
         similarities.to_csv(self.data_path + '/module_similarities.csv')
         return similarities
     
-     def prioritize_genes(self, genes, modules):
+    def prioritize_genes(self, genes, modules):
         """
         Returns a df with gene and score for cosine similarity of gene embedding to module vector, sorted by similarity
         :param genes: list of gene names
@@ -108,6 +108,8 @@ class Modules(object):
                                         columns=[module], index=genes).sort_values(by=module, ascending=False)
             scores = scores.join(similarities, how = 'left')
         return scores
+    
+     
 
      def get_module_features(self):
         """

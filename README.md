@@ -110,9 +110,10 @@ Notebook to calculate differnt metrics to determine how dispersed genes in a mod
 
 
 ## Results:
+
  **benchmarking:** Folder that contains the results from benchmarking the model and different cutoffs. Results are generated from part 1 of 'train_final_model.ipynb'
  1. befree_cutoffs.csv - results from benchmarking the cutoff for befree genes (i.e. which befree genes are used as positives in model testing). Rows are AUROC and AP scores, columns are different cutoffs. Cutoff of -1 means that all genes are used
- 2. svensson_cutoffs.csv - results from benchmarking the cutoff for svensson genes (i.e. which svensson genes are used as positives in model testing). Rows are AUROC and AP scores, columns are different cutoffs. Cutoff of 0 means that all genes are used
+ 2. svensson_cutoffs.csv - results from benchmarking the cutoff for svensson genes (i.e. which svensson genes are used as positives in model testing). Rows are AUROC and AP scores, columns are different cutoffs. Cutoff of -2 means that all genes are used
  3. full_summary.csv - Summary of results from benchmarking different model configurations (as described in benchmarking.ipynb). Each combination of different parameters has two rows: one for AUROC, one for AP. The befree column tests the model trained with that combination of parameters on the befree genes as positives and the held out negative set. The svensson column tests the model on the svensson genes as positives and the held out negative set. Columns labeled 1-10 are the results of 10-fold cross validation using curated genes as positives and all other training genes as negatives. 
  
 Each of these models is saved along with its benchmarking output:
@@ -127,11 +128,21 @@ Each of these models is saved along with its benchmarking output:
              
 **final_model_svc:** Directory that contains the results from the refined model as described in part 2 of train_final_model.ipynb. Contains the saved Nash_Model object, a csv of all 14,707 genes and their scores from the sklearn's predict_proba, a csv of binary predictions for each of those genes using sklearn's predict, and the feature importance scores for each of the 237 modules and their p-values. 
 
-
 **drug_targets_scored.csv:** list of drugs that have been in phase 2-3 for Nash mapped to their targets and the model's probability score for those targets
 
+**module_normalization.csv:** list of modules their mean and standard deviations for cosine similarities of genes within a module to each other and to the summed module vector.
 
 ## Figures:
+
+Each figure is in its own folder and has an ipynb that was used to generate the figure.
+
+**Figure 1:** ROC and Precision Recall curves for testing the final trained model on the Svensson genes and Befree genes.
+
+**Figure 2:** Model probability score vs log fold change for genes given by the Svensson lab. Correlation coefficients and p-values.
+
+**Figure 3:** TODO - drugs
+
+**Figure 4:** Table of top 20 genes with the highest scores from the model that are not in any of the known Nash related gene sets (curated, svensson(200), befree). Also a table of the top 64 modules that were used as features in the predictive model.
 
 ## To alter figures or models:
 
