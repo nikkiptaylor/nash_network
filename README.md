@@ -89,7 +89,7 @@ Examples of how to instantiate the model with different configurations can be fo
 **train_final_model.ipynb**
 
 
-Part 1: Benchmarking - 
+_Part 1: Benchmarking_ - 
 
 Does benchmarking of model parameters, including
 1. Features: gene embeddings vs module scores vs module scores with feature selection
@@ -98,7 +98,7 @@ Does benchmarking of model parameters, including
     
 Also does benchmarking of how different score cuttofs for Svensson genes and Befree genes impact ROC and AP scores for the final trained model (detailed in 'train_final_model.ipynb')
 
-Part 2: Train refined model and score genes - 
+_Part 2: Train refined model and score genes_ - 
 
 Trains and saves the final "refined" model that performed best based on benchmarking and Svensson/Befree genes as external test sets.
 
