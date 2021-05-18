@@ -74,7 +74,7 @@ Note: this file contains a number of methods that were used for previous analysi
 
 **refined_model.py:** 
 
-Contains a Nash_Model class and methods to be used for training and testing predictive models using the modules and genesets described above. Th model is used to train and test a binary classifier for genes to predict whether genes are Nash related ('positive') or not ('negative').
+Contains a Nash_Model class and methods to be used for training and testing predictive models using the modules and genesets described above. The model is used to train and test a binary classifier for genes to predict whether genes are Nash related ('positive') or not ('negative').
 
 To train model:
 1. Instantiate a Nash_Model object with desired parameters
