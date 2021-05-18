@@ -56,16 +56,16 @@ Creating a Modules instance loads the embeddings, module vectors, dicts to map g
 Example:
 ```
 m = Modules() # initialize to load module info
-m.gene_embeddings # pandas dataframe with genes as index, embedding vectors as columns
-m.module_to_genes['cytokines'] # gets list of genes in cytokine module
-m.gene_to_modules['ACSL1'] # gets list of modules ACSL1 is in
+m.gene_embeddings # get pandas dataframe with genes as index, embedding vectors as columns
+m.module_to_genes['cytokines'] # get list of genes in cytokine module
+m.gene_to_modules['ACSL1'] # get list of modules ACSL1 is in
 ```
 
 The most important methods for getting features to feed into the predictive model are
 ``` 
 # return matrix of cosine similarity between specified gene embeddings and module vectors
 m.prioritize_genes(genes, modules) 
-# returns matrix of cosine similarity between all 14,707 embedded genes and all 237 modules
+# return matrix of cosine similarity between all 14,707 embedded genes and all 237 modules
 m.get_module_features 
 ```
 
