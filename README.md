@@ -106,7 +106,7 @@ The final model used to score all genes included a Linear SVC, training using al
 
 **module_dispersion.ipynb**
 
-Notebook to calculate differnt metrics to determine how dispersed genes in a module are within the embedding space
+Notebook to calculate different metrics to determine how dispersed genes in a module are within the embedding space
 
 
 ## Results:
