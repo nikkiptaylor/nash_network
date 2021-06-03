@@ -1,4 +1,6 @@
 # nash_network
+draft: https://docs.google.com/document/d/1GtHmeF0vBnJVyqVeIRWMUetUYzXfIXGukrCUYq8cnoY/edit
+
 
 ## General Info:
 ### Gene sets:
