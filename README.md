@@ -108,7 +108,7 @@ The final model used to score all genes included a Linear SVC, training using al
 
 **module_dispersion.ipynb**
 
-Notebook to calculate different metrics to determine how dispersed genes in a module are within the embedding space
+Notebook to calculate different metrics to determine how dispersed genes in a module are within the embedding space. Table can be supplementary material.
 
 
 ## Results:
@@ -116,7 +116,7 @@ Notebook to calculate different metrics to determine how dispersed genes in a mo
  **benchmarking:** Folder that contains the results from benchmarking the model and different cutoffs. Results are generated from part 1 of 'train_final_model.ipynb'
  1. befree_cutoffs.csv - results from benchmarking the cutoff for befree genes (i.e. which befree genes are used as positives in model testing). Rows are AUROC and AP scores, columns are different cutoffs. Cutoff of -1 means that all genes are used
  2. svensson_cutoffs.csv - results from benchmarking the cutoff for svensson genes (i.e. which svensson genes are used as positives in model testing). Rows are AUROC and AP scores, columns are different cutoffs. Cutoff of -2 means that all genes are used
- 3. full_summary.csv - Summary of results from benchmarking different model configurations (as described in benchmarking.ipynb). Each combination of different parameters has two rows: one for AUROC, one for AP. The befree column tests the model trained with that combination of parameters on the befree genes as positives and the held out negative set. The svensson column tests the model on the svensson genes as positives and the held out negative set. Columns labeled 1-10 are the results of 10-fold cross validation using curated genes as positives and all other training genes as negatives. 
+ 3. full_summary.csv - Summary of results from benchmarking different model configurations (as described in benchmarking.ipynb). Each combination of different parameters has two rows: one for AUROC, one for AP. The befree column tests the model trained with that combination of parameters on the befree genes as positives and the held out negative set. The svensson column tests the model on the svensson genes as positives and the held out negative set. Columns labeled 1-10 are the results of 10-fold cross validation using curated genes as positives and all other training genes as negatives. Table can be supplementary material.
  
 Each of these models is saved along with its benchmarking output:
 * embeddings = model was trained using embeddings as features
@@ -142,9 +142,13 @@ Each figure is in its own folder and has an ipynb that was used to generate the 
 
 **Figure 2:** Model probability score vs log fold change for genes given by the Svensson lab. Correlation coefficients and p-values.
 
-**Figure 3:** TODO - drugs
+**Figure 3:** Ranking of NASH drug targets and controls using model scores.
 
 **Figure 4:** Table of top 20 genes with the highest scores from the model that are not in any of the known Nash related gene sets (curated, svensson(200), befree). Also a table of the top 64 modules that were used as features in the predictive model.
+
+**Supplementary Material:**
+Table 1: results/benchmarking/full_summary.csv
+Table 2: results/module_dispersion.csv
 
 ## To alter figures or models:
 
