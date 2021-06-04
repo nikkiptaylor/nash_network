@@ -1,4 +1,6 @@
 # nash_network
+draft: https://docs.google.com/document/d/1GtHmeF0vBnJVyqVeIRWMUetUYzXfIXGukrCUYq8cnoY/edit
+
 
 ## General Info:
 ### Gene sets:
@@ -56,16 +58,16 @@ Creating a Modules instance loads the embeddings, module vectors, dicts to map g
 Example:
 ```
 m = Modules() # initialize to load module info
-m.gene_embeddings # pandas dataframe with genes as index, embedding vectors as columns
-m.module_to_genes['cytokines'] # gets list of genes in cytokine module
-m.gene_to_modules['ACSL1'] # gets list of modules ACSL1 is in
+m.gene_embeddings # get pandas dataframe with genes as index, embedding vectors as columns
+m.module_to_genes['cytokines'] # get list of genes in cytokine module
+m.gene_to_modules['ACSL1'] # get list of modules ACSL1 is in
 ```
 
 The most important methods for getting features to feed into the predictive model are
 ``` 
 # return matrix of cosine similarity between specified gene embeddings and module vectors
 m.prioritize_genes(genes, modules) 
-# returns matrix of cosine similarity between all 14,707 embedded genes and all 237 modules
+# return matrix of cosine similarity between all 14,707 embedded genes and all 237 modules
 m.get_module_features 
 ```
 
@@ -74,7 +76,7 @@ Note: this file contains a number of methods that were used for previous analysi
 
 **refined_model.py:** 
 
-Contains a Nash_Model class and methods to be used for training and testing predictive models using the modules and genesets described above. Th model is used to train and test a binary classifier for genes to predict whether genes are Nash related ('positive') or not ('negative').
+Contains a Nash_Model class and methods to be used for training and testing predictive models using the modules and genesets described above. The model is used to train and test a binary classifier for genes to predict whether genes are Nash related ('positive') or not ('negative').
 
 To train model:
 1. Instantiate a Nash_Model object with desired parameters
@@ -89,7 +91,7 @@ Examples of how to instantiate the model with different configurations can be fo
 **train_final_model.ipynb**
 
 
-Part 1: Benchmarking - 
+_Part 1: Benchmarking_ - 
 
 Does benchmarking of model parameters, including
 1. Features: gene embeddings vs module scores vs module scores with feature selection
@@ -98,7 +100,7 @@ Does benchmarking of model parameters, including
     
 Also does benchmarking of how different score cuttofs for Svensson genes and Befree genes impact ROC and AP scores for the final trained model (detailed in 'train_final_model.ipynb')
 
-Part 2: Train refined model and score genes - 
+_Part 2: Train refined model and score genes_ - 
 
 Trains and saves the final "refined" model that performed best based on benchmarking and Svensson/Befree genes as external test sets.
 
@@ -106,7 +108,7 @@ The final model used to score all genes included a Linear SVC, training using al
 
 **module_dispersion.ipynb**
 
-Notebook to calculate differnt metrics to determine how dispersed genes in a module are within the embedding space
+Notebook to calculate different metrics to determine how dispersed genes in a module are within the embedding space
 
 
 ## Results:
