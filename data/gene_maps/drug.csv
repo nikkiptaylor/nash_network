@@ -1,51 +1,57 @@
-﻿gene,module
-FADS5,ARAMCHOL
-SCD,ARAMCHOL
-SCDOS,ARAMCHOL
-FGF21,BMS-986036
-CCR2,CENICRIVIROC
-CCR5,CENICRIVIROC
-CMKBR2,CENICRIVIROC
-CMKBR5,CENICRIVIROC
-NR1C1,ELAFIBRANOR
-NR1C2,ELAFIBRANOR
-PPARA,ELAFIBRANOR
-PPARD,ELAFIBRANOR
-PPARG,ELAFIBRANOR
-CASP1,EMRICASAN
-CASP12,EMRICASAN
-CASP14,EMRICASAN
-CASP3,EMRICASAN
-CASP4,EMRICASAN
-CASP5,EMRICASAN
-CASP6,EMRICASAN
-CASP7,EMRICASAN
-CASP8,EMRICASAN
-CASP9,EMRICASAN
-GALID,GR-MD-02
-LGALS3,GR-MD-02
-LGALS2,GR-MD-03
-MAC-2,GR-MD-03
-GLP1R,LIRAGLUTIDE
-ERBA-BETA,MGL-3196
-ERBA2,MGL-3196
-GRNTH,MGL-3196
-NRA1A2,MGL-3196
-PRTH,MGL-3196
-THR1,MGL-3196
-THRB,MGL-3196
-THRB1,MGL-3196
-THRB2,MGL-3196
-BAR,OBETICHOLIC ACID
-FXR,OBETICHOLIC ACID
-HRR1,OBETICHOLIC ACID
-NR1H4,OBETICHOLIC ACID
-RIP14,OBETICHOLIC ACID
-ASK1,SELONSERTIB
-MAP3K5,SELONSERTIB
-MAPKKK5,SELONSERTIB
-MEKK5,SELONSERTIB
-GLP1R,SEMAGLUTIDE
-ASBT,VOLIXIBAT
-ISBT,VOLIXIBAT
-SLC10A2,VOLIXIBAT
+﻿gene,module,use,phase,notes
+FADS5,ARAMCHOL,nash,beyond phase 2,recruiting phase 3
+SCD,ARAMCHOL,nash,beyond phase 2,recruiting phase 3
+SCDOS,ARAMCHOL,nash,beyond phase 2,recruiting phase 3
+FGF21,BMS-986036,nash,in phase 2,
+CCR2,CENICRIVIROC,nash,beyond phase 2,terminated due to lack of efficacy
+CCR5,CENICRIVIROC,nash,beyond phase 2,terminated due to lack of efficacy
+CMKBR2,CENICRIVIROC,nash,beyond phase 2,terminated due to lack of efficacy
+CMKBR5,CENICRIVIROC,nash,beyond phase 2,terminated due to lack of efficacy
+NR1C1,ELAFIBRANOR,nash,beyond phase 2,terminated due to lack of efficacy
+NR1C2,ELAFIBRANOR,nash,beyond phase 2,terminated due to lack of efficacy
+PPARA,ELAFIBRANOR,nash,beyond phase 2,terminated due to lack of efficacy
+PPARD,ELAFIBRANOR,nash,beyond phase 2,terminated due to lack of efficacy
+PPARG,ELAFIBRANOR,nash,beyond phase 2,terminated due to lack of efficacy
+CASP1,EMRICASAN,nash,terminated in phase 2b,terminated due to lack of efficacy
+CASP12,EMRICASAN,nash,terminated in phase 2b,terminated due to lack of efficacy
+CASP14,EMRICASAN,nash,terminated in phase 2b,terminated due to lack of efficacy
+CASP3,EMRICASAN,nash,terminated in phase 2b,terminated due to lack of efficacy
+CASP4,EMRICASAN,nash,terminated in phase 2b,terminated due to lack of efficacy
+CASP5,EMRICASAN,nash,terminated in phase 2b,terminated due to lack of efficacy
+CASP6,EMRICASAN,nash,terminated in phase 2b,terminated due to lack of efficacy
+CASP7,EMRICASAN,nash,terminated in phase 2b,terminated due to lack of efficacy
+CASP8,EMRICASAN,nash,terminated in phase 2b,terminated due to lack of efficacy
+CASP9,EMRICASAN,nash,terminated in phase 2b,terminated due to lack of efficacy
+GALID,GR-MD-02,nash,beginning phase 2b,
+LGALS3,GR-MD-02,nash,beginning phase 2b,
+LGALS2,GR-MD-03,nash,beginning phase 2b,
+MAC-2,GR-MD-02,nash,beginning phase 2b,
+GLP1R,LIRAGLUTIDE,nash,completed phase 2,
+ERBA-BETA,RESMETIROM,nash,beyond phase 2,recruiting phase 3
+ERBA2,RESMETIROM,nash,beyond phase 2,recruiting phase 3
+GRNTH,RESMETIROM,nash,beyond phase 2,recruiting phase 3
+NRA1A2,RESMETIROM,nash,beyond phase 2,recruiting phase 3
+PRTH,RESMETIROM,nash,beyond phase 2,recruiting phase 3
+THR1,RESMETIROM,nash,beyond phase 2,recruiting phase 3
+THRB,RESMETIROM,nash,beyond phase 2,recruiting phase 3
+THRB1,RESMETIROM,nash,beyond phase 2,recruiting phase 3
+THRB2,RESMETIROM,nash,beyond phase 2,recruiting phase 3
+BAR,OBETICHOLIC ACID,nash,beyond phase 2,received fda crl
+FXR,OBETICHOLIC ACID,nash,beyond phase 2,received fda crl
+HRR1,OBETICHOLIC ACID,nash,beyond phase 2,received fda crl
+NR1H4,OBETICHOLIC ACID,nash,beyond phase 2,received fda crl
+RIP14,OBETICHOLIC ACID,nash,beyond phase 2,received fda crl
+ASK1,SELONSERTIB,nash,,terminated due to lack of efficacy
+MAP3K5,SELONSERTIB,nash,,terminated due to lack of efficacy
+MAPKKK5,SELONSERTIB,nash,,terminated due to lack of efficacy
+MEKK5,SELONSERTIB,nash,,terminated due to lack of efficacy
+GLP1R,SEMAGLUTIDE,nash,completed phase 2,
+ASBT,VOLIXIBAT,nash,terminated in phase 2b,terminated due to lack of efficacy
+ISBT,VOLIXIBAT,nash,terminated in phase 2b,terminated due to lack of efficacy
+SLC10A2,VOLIXIBAT,nash,terminated in phase 2,terminated due to lack of efficacy
+MT-CO1,NSAID,NSAID,,
+MT-CO2,NSAID,NSAID,,
+PTGS1,NSAID,NSAID,,
+PTGS2,NSAID,NSAID,,
+IL23A,INTERLEUKIN INHIBITORS,immunosuppressant,,
+IL23R,INTERLEUKIN INHIBITORS,immunosuppressant,,
